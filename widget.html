@@ -1,4 +1,4 @@
-<div id="medium-widget" style="background:#f9f9f9; border:1px solid #ccc; border-radius:12px; padding:16px; max-width:300px; font-family:Roboto; min-height:100px;">
+<div id="medium-widget" style="background:#f9f9f9; border:1px solid #ccc; border-radius:12px; padding:16px; max-width:300px; font-family:Roboto, sans-serif; min-height:100px;">
   <a id="article-link" href="#" target="_blank" style="text-decoration:none; color:inherit;">
     <div id="article-text" style="margin:0; line-height:1.4;"></div>
   </a>
@@ -47,15 +47,17 @@
       const articleTextElem = document.getElementById('article-text');
       const articleLinkElem = document.getElementById('article-link');
 
-      articleTextElem.innerHTML = `<strong>${article.title}</strong><br>${article.blurb}`;
-      articleLinkElem.href = article.link;
+      if (articleTextElem && articleLinkElem) {
+        articleTextElem.innerHTML = `<strong>${article.title}</strong><br>${article.blurb}`;
+        articleLinkElem.href = article.link;
+      }
     }
 
     function startRotation() {
       intervalId = setInterval(() => {
         index = (index + 1) % articles.length;
         showArticle(index);
-      }, 30000); // 30 seconds
+      }, 30000);
     }
 
     function stopRotation() {
@@ -63,11 +65,12 @@
     }
 
     const widget = document.getElementById('medium-widget');
-    widget.addEventListener('mouseenter', stopRotation);
-    widget.addEventListener('mouseleave', startRotation);
+    if (widget) {
+      widget.addEventListener('mouseenter', stopRotation);
+      widget.addEventListener('mouseleave', startRotation);
 
-    // Start
-    showArticle(index);
-    startRotation();
+      showArticle(index);
+      startRotation();
+    }
   });
 </script>
