@@ -6,6 +6,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+<meta name="description" content="Guessorix is a number guessing game where players guess a secret 5-digit code using hints. Perfect for fans of logic puzzles and brain teasers." />
+<meta name="keywords" content="Guessorix, number guessing game, logic puzzle, brain teaser, code breaker, secret code game, puzzle challenge" />
   <title>Guessorix</title>
   <style>
     body {
@@ -125,11 +127,16 @@
   #resetBtn:hover {
     background-color: #0056b3; /* Darker blue on hover */
   }
+#game-container {
+  max-width: 400px;
+  margin: auto;
+}
   </style>
 </head>
 <body>
-
-  <h1>Guessorix</h1>
+<div id="game-container">
+  
+<h1>Guessorix</h1>
   <div id="board"></div>
   <div id="message"></div>
   <div id="keyboard">
@@ -138,6 +145,7 @@
     <div class="key-row" id="row3"></div>
   </div>
   <button id="resetBtn">Reset Game</button>
+</div>
 
   <script>
   const digits = 5;        // Length of secret number
