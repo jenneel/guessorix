@@ -1,56 +1,58 @@
-<div id="medium-widget" style="background:#f9f9f9; border:1px solid #ccc; border-radius:12px; padding:16px; max-width:300px; font-family:Roboto;">
+<div id="medium-widget" style="background:#f9f9f9; border:1px solid #ccc; border-radius:12px; padding:16px; max-width:300px; font-family:Roboto; min-height:100px;">
   <a id="article-link" href="#" target="_blank" style="text-decoration:none; color:inherit;">
-    <p id="article-text" style="margin:0; line-height:1.4;"></p>
+    <div id="article-text" style="margin:0; line-height:1.4;"></div>
   </a>
 </div>
 
 <script>
-  const articles = [
-    {
-      title: "Teaching in the Age of AI",
-      blurb: "Are we preparing students for a world that's already here?",
-      link: "https://medium.com/@jennaneel/teaching-in-the-age-of-ai-c099f90e2a2b?source=friends_link&sk=f0dc0ae775af8cdb0b04c57d2c909ada"
-    },
-    {
-      title: "What Online Teaching Taught Me About Showing Up",
-      blurb: "The hardest part of virtual teaching isn't the tech. It's the silence.",
-      link: "https://medium.com/knowlobby/what-online-teaching-taught-me-about-showing-up-even-when-no-one-else-does-9a7494e70892?source=friends_link&sk=2cbdeb98d0a6b2ef0cb60918cfb8f3ce"
-    },
-    {
-      title: "I Used to Hate Math: How One Student's Mindset Shift Changed Everything",
-      blurb: "What happens when we stop teaching math as a set of rules and start teaching it as a way of thinking?",
-      link: "https://medium.com/knowlobby/i-used-to-hate-math-how-one-students-mindset-shift-changed-everything-17b110e8e12c?source=friends_link&sk=065e7e846dc5da28c1819c68a0133f83"
+  document.addEventListener('DOMContentLoaded', () => {
+    const articles = [
+      {
+        title: "Teaching in the Age of AI",
+        blurb: "Are we preparing students for a world that's already here?",
+        link: "https://medium.com/@jennaneel/teaching-in-the-age-of-ai-c099f90e2a2b?source=friends_link&sk=f0dc0ae775af8cdb0b04c57d2c909ada"
+      },
+      {
+        title: "What Online Teaching Taught Me About Showing Up",
+        blurb: "The hardest part of virtual teaching isn't the tech. It's the silence.",
+        link: "https://medium.com/knowlobby/what-online-teaching-taught-me-about-showing-up-even-when-no-one-else-does-9a7494e70892?source=friends_link&sk=2cbdeb98d0a6b2ef0cb60918cfb8f3ce"
+      },
+      {
+        title: "I Used to Hate Math: How One Student's Mindset Shift Changed Everything",
+        blurb: "What happens when we stop teaching math as a set of rules and start teaching it as a way of thinking?",
+        link: "https://medium.com/knowlobby/i-used-to-hate-math-how-one-students-mindset-shift-changed-everything-17b110e8e12c?source=friends_link&sk=065e7e846dc5da28c1819c68a0133f83"
+      }
+    ];
+
+    let index = 0;
+    let intervalId;
+
+    function showArticle(i) {
+      const article = articles[i];
+      const articleTextElem = document.getElementById('article-text');
+      const articleLinkElem = document.getElementById('article-link');
+
+      articleTextElem.innerHTML = `<strong>${article.title}</strong><br>${article.blurb}`;
+      articleLinkElem.href = article.link;
     }
-  ];
 
-  let index = 0;
-  let intervalId;
+    function startRotation() {
+      intervalId = setInterval(() => {
+        index = (index + 1) % articles.length;
+        showArticle(index);
+      }, 30000); // 30 seconds
+    }
 
-  function showArticle(i) {
-    const article = articles[i];
-    const articleTextElem = document.getElementById('article-text');
-    const articleLinkElem = document.getElementById('article-link');
+    function stopRotation() {
+      clearInterval(intervalId);
+    }
 
-    articleTextElem.innerHTML = `<strong>${article.title}</strong><br>${article.blurb}`;
-    articleLinkElem.href = article.link;
-  }
+    const widget = document.getElementById('medium-widget');
+    widget.addEventListener('mouseenter', stopRotation);
+    widget.addEventListener('mouseleave', startRotation);
 
-  function startRotation() {
-    intervalId = setInterval(() => {
-      index = (index + 1) % articles.length;
-      showArticle(index);
-    }, 30000); // 30 seconds rotation
-  }
-
-  function stopRotation() {
-    clearInterval(intervalId);
-  }
-
-  const widget = document.getElementById('medium-widget');
-  widget.addEventListener('mouseenter', stopRotation);
-  widget.addEventListener('mouseleave', startRotation);
-
-  // Initial display and start
-  showArticle(index);
-  startRotation();
+    // Start
+    showArticle(index);
+    startRotation();
+  });
 </script>
