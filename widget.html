@@ -1,25 +1,25 @@
 <div id="medium-widget" style="background:#f9f9f9; border:1px solid #ccc; border-radius:12px; padding:16px; max-width:300px; font-family:Roboto;">
-  <h3 style="font-family:Merriweather; font-size:18px;">Featured Article</h3>
-  <p id="article-text" style="margin:10px 0;"></p>
-  <a id="article-link" href="#" target="_blank" style="display:inline-block; background:#333; color:#fff; padding:10px 16px; text-decoration:none; border-radius:6px;">Read Now</a>
+  <a id="article-link" href="#" target="_blank" style="text-decoration:none; color:inherit;">
+    <p id="article-text" style="margin:0; line-height:1.4;"></p>
+  </a>
 </div>
 
 <script>
   const articles = [
     {
-      title: "I Used to Hate Math",
-      blurb: "A real story about what happens when we stop teaching rules and start teaching thinking.",
-      link: "https://medium.com/your-article-1"
+      title: "Teaching in the Age of AI",
+      blurb: "Are we preparing students for a world that's already here?",
+      link: "https://medium.com/@jennaneel/teaching-in-the-age-of-ai-c099f90e2a2b?source=friends_link&sk=f0dc0ae775af8cdb0b04c57d2c909ada"
     },
     {
-      title: "The Six Habits of Highly Successful Online Students",
-      blurb: "How small habits make a big difference in online learning success.",
-      link: "https://medium.com/your-article-2"
+      title: "What Online Teaching Taught Me About Showing Up",
+      blurb: "The hardest part of virtual teaching isn't the tech. It's the silence.",
+      link: "https://medium.com/knowlobby/what-online-teaching-taught-me-about-showing-up-even-when-no-one-else-does-9a7494e70892?source=friends_link&sk=2cbdeb98d0a6b2ef0cb60918cfb8f3ce"
     },
     {
-      title: "Cheating Happens—Now What?",
-      blurb: "A practical look at how to handle academic integrity in the age of AI.",
-      link: "https://medium.com/your-article-3"
+      title: "I Used to Hate Math: How One Student's Mindset Shift Changed Everything",
+      blurb: "What happens when we stop teaching math as a set of rules and start teaching it as a way of thinking?",
+      link: "https://medium.com/knowlobby/i-used-to-hate-math-how-one-students-mindset-shift-changed-everything-17b110e8e12c?source=friends_link&sk=065e7e846dc5da28c1819c68a0133f83"
     }
   ];
 
@@ -28,8 +28,11 @@
 
   function showArticle(i) {
     const article = articles[i];
-    document.getElementById('article-text').innerText = `${article.title}: ${article.blurb}`;
-    document.getElementById('article-link').href = article.link;
+    const articleTextElem = document.getElementById('article-text');
+    const articleLinkElem = document.getElementById('article-link');
+
+    articleTextElem.innerHTML = `<strong>${article.title}</strong><br>${article.blurb}`;
+    articleLinkElem.href = article.link;
   }
 
   function startRotation() {
