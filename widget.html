@@ -1,0 +1,53 @@
+<div id="medium-widget" style="background:#f9f9f9; border:1px solid #ccc; border-radius:12px; padding:16px; max-width:300px; font-family:Roboto;">
+  <h3 style="font-family:Merriweather; font-size:18px;">Featured Article</h3>
+  <p id="article-text" style="margin:10px 0;"></p>
+  <a id="article-link" href="#" target="_blank" style="display:inline-block; background:#333; color:#fff; padding:10px 16px; text-decoration:none; border-radius:6px;">Read Now</a>
+</div>
+
+<script>
+  const articles = [
+    {
+      title: "I Used to Hate Math",
+      blurb: "A real story about what happens when we stop teaching rules and start teaching thinking.",
+      link: "https://medium.com/your-article-1"
+    },
+    {
+      title: "The Six Habits of Highly Successful Online Students",
+      blurb: "How small habits make a big difference in online learning success.",
+      link: "https://medium.com/your-article-2"
+    },
+    {
+      title: "Cheating Happens—Now What?",
+      blurb: "A practical look at how to handle academic integrity in the age of AI.",
+      link: "https://medium.com/your-article-3"
+    }
+  ];
+
+  let index = 0;
+  let intervalId;
+
+  function showArticle(i) {
+    const article = articles[i];
+    document.getElementById('article-text').innerText = `${article.title}: ${article.blurb}`;
+    document.getElementById('article-link').href = article.link;
+  }
+
+  function startRotation() {
+    intervalId = setInterval(() => {
+      index = (index + 1) % articles.length;
+      showArticle(index);
+    }, 30000); // 30 seconds rotation
+  }
+
+  function stopRotation() {
+    clearInterval(intervalId);
+  }
+
+  const widget = document.getElementById('medium-widget');
+  widget.addEventListener('mouseenter', stopRotation);
+  widget.addEventListener('mouseleave', startRotation);
+
+  // Initial display and start
+  showArticle(index);
+  startRotation();
+</script>

@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+  <title>Guessorix</title>
+  <style>
+    body {
+  font-family: "Roboto", sans-serif;
+      padding: 20px;
+      max-width: 400px;
+      margin: auto;
+    }
+  h1 {
+  text-align: center;
+  font-size: 3rem;
+  font-family: "Orbitron", sans-serif;
+  font-weight: 700; /* You can adjust this between 400–900 */
+}
+    #board {
+      display: grid;
+      grid-template-columns: repeat(5, 40px);
+      gap: 5px;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .cell {
+      width: 40px;
+      height: 40px;
+      border: 2px solid #ccc;
+      font-size: 24px;
+      text-align: center;
+      line-height: 40px;
+      user-select: none;
+      cursor: pointer;
+      background-color: white;
+      transition: background-color 0.3s, border-color 0.3s;
+    }
+    .cell.correct {
+      background-color: green;
+      color: white;
+      border-color: green;
+    }
+    .cell.present {
+      background-color: gold;
+      color: black;
+      border-color: gold;
+    }
+    .cell.absent {
+      background-color: #666666;
+      color: white;
+      border-color: #666666;
+    }
+.key.correct {
+  background-color: green;
+  color: white;
+  border-color: green;
+}
+
+.key.present {
+  background-color: gold;
+  color: black;
+  border-color: gold;
+}
+
+.key.absent {
+  background-color: #666666;
+  color: white;
+  border-color: #666666;
+}
+    #message {
+      text-align: center;
+      margin-bottom: 20px;
+      min-height: 1.5em;
+    }
+    button, .key {
+      font-size: 18px;
+      padding: 10px 15px;
+      margin: 3px;
+      cursor: pointer;
+      border: 1px solid #999;
+      border-radius: 5px;
+      background-color: #f0f0f0;
+      user-select: none;
+      min-width: 40px;
+      text-align: center;
+    }
+    button:hover, .key:hover {
+      background-color: #ddd;
+    }
+    #keyboard {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      user-select: none;
+    }
+    .key-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+    .key.wide {
+      min-width: 80px;
+    }
+#resetBtn {
+    background-color: #007BFF;  /* Blue color */
+    color: white;
+    border: none;
+    padding: 12px 25px;
+    font-size: 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: block;
+    margin: 20px auto 0 auto; /* top margin 20px, center horizontally */
+    width: fit-content;
+    user-select: none;
+    transition: background-color 0.3s;
+  }
+
+  #resetBtn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+  }
+#game-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+  </style>
+</head>
+<body>
+<div id="widget-placeholder"></div>
+<div id="game-container">
+  <h1>Guessorix</h1>
+  <div id="board"></div>
+  <div id="message"></div>
+  <div id="keyboard">
+    <div class="key-row" id="row1"></div>
+    <div class="key-row" id="row2"></div>
+    <div class="key-row" id="row3"></div>
+  </div>
+  <button id="resetBtn">Reset Game</button>
+
+  <script>
+  const digits = 5;        // Length of secret number
+  const attempts = 6;      // Max guesses
+  let secret = '';
+  let currentRow = 0;
+  let currentCol = 0;
+  let board = [];
+  const boardDiv = document.getElementById('board');
+  const messageDiv = document.getElementById('message');
+  const resetBtn = document.getElementById('resetBtn');
+
+  // Generate a random secret number with digits 0-9
+  function generateSecret() {
+    let num = '';
+    while (num.length < digits) {
+      num += Math.floor(Math.random() * 10).toString();
+    }
+    return num;
+  }
+
+  // Create the board grid of cells
+  function createBoard() {
+    boardDiv.innerHTML = '';
+    board = [];
+    for (let r = 0; r < attempts; r++) {
+      const row = [];
+      for (let c = 0; c < digits; c++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.textContent = '';
+        row.push(cell);
+        boardDiv.appendChild(cell);
+      }
+      board.push(row);
+    }
+  }
+
+  // Clear all colors from the row
+  function clearRowColors(row) {
+    for (let i = 0; i < digits; i++) {
+      board[row][i].classList.remove('correct', 'present', 'absent');
+    }
+  }
+
+  // Mark the guess row with colors
+  function markRow(guess) {
+    // Count digits in secret
+    const secretCount = {};
+    for (let ch of secret) {
+      secretCount[ch] = (secretCount[ch] || 0) + 1;
+    }
+
+    const matched = new Array(digits).fill(false);
+
+    // First pass: correct (green)
+    for (let i = 0; i < digits; i++) {
+      const cell = board[currentRow][i];
+      cell.classList.remove('correct', 'present', 'absent');
+
+      if (guess[i] === secret[i]) {
+        cell.classList.add('correct');
+        matched[i] = true;
+        secretCount[guess[i]]--;
+      }
+    }
+
+    // Second pass: present (yellow) or absent (gray)
+    for (let i = 0; i < digits; i++) {
+      if (!matched[i]) {
+        const cell = board[currentRow][i];
+        if (secretCount[guess[i]] > 0) {
+          cell.classList.add('present');
+          secretCount[guess[i]]--;
+        } else {
+          cell.classList.add('absent');
+        }
+      }
+    }
+  }
+
+  // New function to update keyboard colors after each guess
+  function updateKeyboardColors(guess) {
+    // Count digits in secret for second pass
+    const secretCount = {};
+    for (let ch of secret) {
+      secretCount[ch] = (secretCount[ch] || 0) + 1;
+    }
+
+    // Track exact matches for first pass
+    const matched = new Array(digits).fill(false);
+
+    // First pass: mark keys green if correct position
+    for (let i = 0; i < digits; i++) {
+      const key = document.querySelector(`.key[data-key="${guess[i]}"]`);
+      if (guess[i] === secret[i]) {
+        if (key) {
+          key.classList.remove('present', 'absent');
+          key.classList.add('correct');
+        }
+        matched[i] = true;
+        secretCount[guess[i]]--;
+      }
+    }
+
+    // Second pass: mark keys yellow if in secret but wrong position
+    for (let i = 0; i < digits; i++) {
+      if (!matched[i]) {
+        const key = document.querySelector(`.key[data-key="${guess[i]}"]`);
+        if (key) {
+          // Only upgrade color if not already green
+          if (!key.classList.contains('correct')) {
+            if (secretCount[guess[i]] > 0) {
+              key.classList.remove('correct', 'absent');
+              key.classList.add('present');
+              secretCount[guess[i]]--;
+            } else {
+              // Only add absent if not green or yellow
+              if (!key.classList.contains('present') && !key.classList.contains('correct')) {
+                key.classList.add('absent');
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Collect guess from current row
+  function getGuess() {
+    let guess = '';
+    for (let i = 0; i < digits; i++) {
+      const val = board[currentRow][i].textContent;
+      if (!val.match(/^[0-9]$/)) return null; // invalid input
+      guess += val;
+    }
+    return guess;
+  }
+
+  // Show message to user
+  function showMessage(msg) {
+    messageDiv.textContent = msg;
+  }
+
+  // Disable further input after win/loss
+  function disableBoard() {
+    for (const row of board) {
+      for (const cell of row) {
+        cell.style.pointerEvents = 'none';
+      }
+    }
+    disableKeyboard();
+  }
+
+  // Enable board input
+  function enableBoard() {
+    for (const row of board) {
+      for (const cell of row) {
+        cell.style.pointerEvents = 'auto';
+        cell.textContent = '';
+        cell.classList.remove('correct', 'present', 'absent');
+      }
+    }
+    enableKeyboard();
+    currentRow = 0;
+    currentCol = 0;
+  }
+
+  // Submit guess logic
+  function submitGuess() {
+    const guess = getGuess();
+    if (guess === null) {
+      showMessage('Please fill all digits with numbers 0-9.');
+      return;
+    }
+
+    markRow(guess);
+    updateKeyboardColors(guess);   // <-- Added this call
+
+    if (guess === secret) {
+      showMessage(`You guessed right! The number was ${secret}. Congratulations!`);
+      disableBoard();
+      return;
+    }
+
+    currentRow++;
+    currentCol = 0;
+
+    if (currentRow === attempts) {
+      showMessage(`Game over! The number was ${secret}. Try again!`);
+      disableBoard();
+      return;
+    } else {
+      showMessage(`Guess #${currentRow + 1}: Enter your digits.`);
+    }
+  }
+
+  // Keyboard input helpers
+  function inputDigit(d) {
+    if (currentRow >= attempts) return; // game over
+    if (currentCol < digits) {
+      board[currentRow][currentCol].textContent = d;
+      currentCol++;
+    }
+  }
+
+  function backspace() {
+    if (currentRow >= attempts) return; // game over
+    if (currentCol > 0) {
+      currentCol--;
+      board[currentRow][currentCol].textContent = '';
+    }
+  }
+
+  // Keyboard event handlers
+  function createKeyboard() {
+    const row1 = document.getElementById('row1');
+    const row2 = document.getElementById('row2');
+    const row3 = document.getElementById('row3');
+
+    // Clear any existing keys
+    row1.innerHTML = '';
+    row2.innerHTML = '';
+    row3.innerHTML = '';
+
+    // Row 1: 1-5
+    for (let i = 1; i <= 5; i++) {
+      const key = createKey(i.toString());
+      row1.appendChild(key);
+    }
+    // Row 2: 6-0
+    for (let i = 6; i <= 9; i++) {
+      const key = createKey(i.toString());
+      row2.appendChild(key);
+    }
+    row2.appendChild(createKey('0'));
+
+    // Row 3: Enter and Backspace
+    const enterKey = createKey('Enter', true);
+    enterKey.addEventListener('click', () => submitGuess());
+    const backspaceKey = createKey('Backspace', true);
+    backspaceKey.textContent = '⌫';
+    backspaceKey.addEventListener('click', () => backspace());
+
+    row3.appendChild(enterKey);
+    row3.appendChild(backspaceKey);
+  }
+
+  function createKey(label, wide = false) {
+    const key = document.createElement('div');
+    key.classList.add('key');
+    if (wide) key.classList.add('wide');
+    key.textContent = label;
+    key.setAttribute('data-key', label); // add data-key attribute for coloring
+    key.addEventListener('click', () => {
+      if (label === 'Enter') {
+        submitGuess();
+      } else if (label === 'Backspace') {
+        backspace();
+      } else if (/^[0-9]$/.test(label)) {
+        inputDigit(label);
+      }
+    });
+    return key;
+  }
+
+  function disableKeyboard() {
+    const keys = document.querySelectorAll('.key');
+    keys.forEach(k => k.style.pointerEvents = 'none');
+  }
+  function enableKeyboard() {
+    const keys = document.querySelectorAll('.key');
+    keys.forEach(k => k.style.pointerEvents = 'auto');
+  }
+
+  // Handle physical keyboard input
+  document.addEventListener('keydown', (e) => {
+    if (currentRow >= attempts) return; // game over
+
+    if (e.key >= '0' && e.key <= '9') {
+      inputDigit(e.key);
+    } else if (e.key === 'Backspace') {
+      backspace();
+    } else if (e.key === 'Enter') {
+      submitGuess();
+    }
+  });
+
+  // Reset game
+  resetBtn.addEventListener('click', () => {
+    secret = generateSecret();
+    enableBoard();
+    clearKeyboardColors();
+    showMessage(`Guess #1: Enter your digits.`);
+  });
+
+  // Clear all colors from keyboard keys on reset
+  function clearKeyboardColors() {
+    const keys = document.querySelectorAll('.key');
+    keys.forEach(key => {
+      key.classList.remove('correct', 'present', 'absent');
+    });
+  }
+
+  // Initialize game
+  function init() {
+    secret = generateSecret();
+    createBoard();
+    createKeyboard();
+    showMessage(`Guess #1: Enter your digits.`);
+    currentRow = 0;
+    currentCol = 0;
+  }
+
+  init();
+</script>
+<script>
+  fetch('widget.html')  // make sure the path is correct relative to your main file
+    .then(response => response.text())
+    .then(html => {
+      document.getElementById('widget-placeholder').innerHTML = html;
+    })
+    .catch(err => {
+      console.error('Failed to load widget:', err);
+    });
+</script>
+</body>
+</html>
